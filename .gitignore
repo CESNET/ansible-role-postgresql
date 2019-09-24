@@ -1,0 +1,6 @@
+# Ignore IntelliJ project files #
+*.iml
+*.ipr
+*.iws
+.idea/
+.password

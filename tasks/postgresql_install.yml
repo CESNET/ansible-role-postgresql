@@ -1,0 +1,68 @@
+---
+- name: "require Debian 10"
+  assert:
+    that:
+      - ansible_distribution == "Debian"
+      - ansible_distribution_major_version == "10"
+    msg: "Only Debian 10 is supported"
+
+- debug:
+    msg: "postgresql_version is {{postgresql_version}}"
+
+- name: "Install lsb-release"
+  apt:
+    name:
+      - lsb-release
+
+- name: "Add PostgreSQL Global Development Group (PGDG) repository key"
+  apt_key:
+    id: ACCC4CF8
+    url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+    state: present
+
+- name: "Add PGDG repository"
+  apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ansible_lsb.codename}}-pgdg main"
+    filename: "pgdg"
+    state: present
+
+- name: "Install packages for Postgres"
+  package:
+    name:
+      - "postgresql-{{ postgresql_version }}"
+      - "postgresql-client-{{ postgresql_version }}"
+      - "python-psycopg2"
+      - "xz-utils"
+    state: present
+
+- name: "Hold postgresql package from upgrading"
+  dpkg_selections:
+    name: "postgresql-{{ postgresql_version }}"
+    selection: hold
+
+- name: "Add rows to pg_hba.conf"
+  become: yes
+  become_user: postgres
+  blockinfile:
+    dest: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    insertafter: '# Database administrative login by Unix domain socket'
+    block: |
+      hostssl all all all          md5
+  notify: "restart postgresql"
+
+- name: Set listen_addresses=* in postgresql.conf
+  lineinfile:
+    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+    regexp: "^#listen_addresses = 'localhost'(.*)$"
+    line: "listen_addresses = '*'\\1"
+    backrefs: yes
+  notify: "restart postgresql"
+
+- name: "Create cron job for dumping data to a file usable for filesystem backup"
+  when: postgresql_daily_backup
+  copy:
+    dest: "/etc/cron.d/postgresql-backup"
+    content: |
+      # Everyday do the backup of the PostgreSQL DB
+      50 22 * * * postgres /usr/bin/pg_dumpall | xz >/var/lib/postgresql/backup.sql.xz

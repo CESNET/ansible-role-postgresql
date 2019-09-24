@@ -1,0 +1,10 @@
+---
+- import_tasks: postgresql_install.yml
+  tags:
+    - postgresql
+
+- import_tasks: postgresql_config.yml
+  tags:
+    - postgresql_config
+    - postgresql
+    - config

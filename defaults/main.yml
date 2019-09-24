@@ -1,0 +1,5 @@
+---
+postgresql_version: 11
+
+postgresql_daily_backup: True
+postgresql_max_connections: 150
