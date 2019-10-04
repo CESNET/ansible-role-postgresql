@@ -7,56 +7,56 @@
   notify: "restart postgresql"
 
 - name: "Set TLS cert"
-  when: postgres_certificate_file is defined
+  when: postgresql_certificate_file is defined
   lineinfile:
     path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
     regexp: 'ssl_cert_file'
-    line: "ssl_cert_file = '{{ postgres_certificate_file }}'"
+    line: "ssl_cert_file = '{{ postgresql_certificate_file }}'"
   notify: "restart postgresql"
 
 - name: "Set TLS key"
-  when: postgres_certificate_key_file is defined
+  when: postgresql_certificate_key_file is defined
   lineinfile:
     path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
     regexp: 'ssl_key_file'
-    line: "ssl_key_file = '{{ postgres_certificate_key_file }}'"
+    line: "ssl_key_file = '{{ postgresql_certificate_key_file }}'"
   notify: "restart postgresql"
 
 - name: "Set TLS CA chain"
-  when: postgres_certificate_chain_file is defined
+  when: postgresql_certificate_chain_file is defined
   lineinfile:
     path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
     regexp: 'ssl_ca_file'
-    line: "ssl_ca_file = '{{ postgres_certificate_chain_file }}'"
+    line: "ssl_ca_file = '{{ postgresql_certificate_chain_file }}'"
   notify: "restart postgresql"
 
-- name: "Create user {{ postgresl_db_user }} without superuser and createdb privileges"
-  when: postgresl_db_user is defined and postgresl_db_user_password is defined
+- name: "Create user {{ postgresql_db_user }} without superuser and createdb privileges"
+  when: postgresql_db_user is defined and postgresql_db_user_password is defined
   become: yes
   become_user: postgres
   postgresql_user:
-    name: "{{ postgresl_db_user }}"
-    password: "{{ postgresl_db_user_password }}"
+    name: "{{ postgresql_db_user }}"
+    password: "{{ postgresql_db_user_password }}"
     role_attr_flags: NOSUPERUSER,NOCREATEDB
     encrypted: yes
     state: present
 
-- name: "Create database {{ postgresl_db_name }} owned by user {{ postgresl_db_user }}"
-  when: postgresl_db_user is defined and postgresl_db_name is defined
+- name: "Create database {{ postgresql_db_name }} owned by user {{ postgresql_db_user }}"
+  when: postgresql_db_user is defined and postgresql_db_name is defined
   become: yes
   become_user: postgres
   postgresql_db:
-    name: "{{ postgresl_db_name }}"
+    name: "{{ postgresql_db_name }}"
     encoding: 'UTF-8'
-    owner: "{{ postgresl_db_user }}"
+    owner: "{{ postgresql_db_user }}"
     state: present
 
-- name: "Create schema {{ postgresl_db_user }} in database {{ postgresl_db_name }}"
-  when: postgresl_db_user is defined and postgresl_db_name is defined
+- name: "Create schema {{ postgresql_db_user }} in database {{ postgresql_db_name }}"
+  when: postgresql_db_user is defined and postgresql_db_name is defined
   become: yes
   become_user: postgres
   postgresql_schema:
-    database: "{{ postgresl_db_name }}"
-    name: "{{ postgresl_db_user }}"
-    owner: "{{ postgresl_db_user }}"
+    database: "{{ postgresql_db_name }}"
+    name: "{{ postgresql_db_user }}"
+    owner: "{{ postgresql_db_user }}"
     state: present

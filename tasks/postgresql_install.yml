@@ -26,7 +26,7 @@
     filename: "pgdg"
     state: present
 
-- name: "Install packages for Postgres"
+- name: "Install packages for Postgres {{ postgresql_version }}"
   package:
     name:
       - "postgresql-{{ postgresql_version }}"
