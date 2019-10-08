@@ -8,3 +8,6 @@
     - postgresql_config
     - postgresql
     - config
+
+- name: "flush handlers"
+  meta: flush_handlers
