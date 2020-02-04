@@ -32,6 +32,8 @@
       - "postgresql-{{ postgresql_version }}"
       - "postgresql-client-{{ postgresql_version }}"
       - "python-psycopg2"
+      - "python-ipaddress"
+      - "libpq-dev"
       - "xz-utils"
     state: present
 
@@ -40,23 +42,21 @@
     name: "postgresql-{{ postgresql_version }}"
     selection: hold
 
-- name: "Add rows to pg_hba.conf"
+- name: "add rows to pg_hba.conf"
+  postgresql_pg_hba:
+    dest: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+    contype: hostssl
+    databases: all
+    users: all
+    address: all
+    method: md5
+
+- name: "allow listening on TCP port on all network interfaces"
   become: yes
   become_user: postgres
-  blockinfile:
-    dest: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK"
-    insertafter: '# Database administrative login by Unix domain socket'
-    block: |
-      hostssl all all all          md5
-  notify: "restart postgresql"
-
-- name: Set listen_addresses=* in postgresql.conf
-  lineinfile:
-    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
-    regexp: "^#listen_addresses = 'localhost'(.*)$"
-    line: "listen_addresses = '*'\\1"
-    backrefs: yes
+  postgresql_set:
+    name: listen_addresses
+    value: '*'
   notify: "restart postgresql"
 
 - name: "Create cron job for dumping data to a file usable for filesystem backup"

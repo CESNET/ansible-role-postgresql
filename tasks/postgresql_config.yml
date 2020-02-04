@@ -1,33 +1,38 @@
 ---
-- name: "Set max_connections = {{ postgresql_max_connections }}"
-  lineinfile:
-    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
-    regexp: '^max_connections'
-    line: "max_connections = {{ postgresql_max_connections }}"
+
+- name: "set max_connections = {{ postgresql_max_connections }}"
+  become: yes
+  become_user: postgres
+  postgresql_set:
+    name: max_connections
+    value: "{{ postgresql_max_connections | string }}"
   notify: "restart postgresql"
 
 - name: "Set TLS cert"
   when: postgresql_certificate_file is defined
-  lineinfile:
-    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
-    regexp: 'ssl_cert_file'
-    line: "ssl_cert_file = '{{ postgresql_certificate_file }}'"
+  become: yes
+  become_user: postgres
+  postgresql_set:
+    name: ssl_cert_file
+    value: "{{ postgresql_certificate_file }}"
   notify: "restart postgresql"
 
 - name: "Set TLS key"
   when: postgresql_certificate_key_file is defined
-  lineinfile:
-    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
-    regexp: 'ssl_key_file'
-    line: "ssl_key_file = '{{ postgresql_certificate_key_file }}'"
+  become: yes
+  become_user: postgres
+  postgresql_set:
+    name: ssl_key_file
+    value: "{{ postgresql_certificate_key_file }}"
   notify: "restart postgresql"
 
 - name: "Set TLS CA chain"
   when: postgresql_certificate_chain_file is defined
-  lineinfile:
-    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
-    regexp: 'ssl_ca_file'
-    line: "ssl_ca_file = '{{ postgresql_certificate_chain_file }}'"
+  become: yes
+  become_user: postgres
+  postgresql_set:
+    name: ssl_ca_file
+    value: "{{ postgresql_certificate_chain_file }}"
   notify: "restart postgresql"
 
 - name: "Create user {{ postgresql_db_user }} without superuser and createdb privileges"
