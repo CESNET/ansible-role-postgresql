@@ -52,6 +52,7 @@
     method: md5
 
 - name: "allow listening on TCP port on all network interfaces"
+  when: postgresql_allow_remote_connections
   become: yes
   become_user: postgres
   postgresql_set:
