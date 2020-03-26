@@ -1,6 +1,8 @@
 ---
 postgresql_version: 12
+postgresql_hold_upgrades: yes
 
-postgresql_daily_backup: True
-postgresql_max_connections: 150
+postgresql_daily_backup: yes
 postgresql_allow_remote_connections: yes
+
+postgresql_settings: {}

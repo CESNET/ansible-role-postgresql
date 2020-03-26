@@ -38,6 +38,7 @@
     state: present
 
 - name: "Hold postgresql package from upgrading"
+  when: postgresql_hold_upgrades
   dpkg_selections:
     name: "postgresql-{{ postgresql_version }}"
     selection: hold
@@ -51,15 +52,6 @@
     address: all
     method: md5
 
-- name: "allow listening on TCP port on all network interfaces"
-  when: postgresql_allow_remote_connections
-  become: yes
-  become_user: postgres
-  postgresql_set:
-    name: listen_addresses
-    value: '*'
-  notify: "restart postgresql"
-
 - name: "Create cron job for dumping data to a file usable for filesystem backup"
   when: postgresql_daily_backup
   copy:
@@ -67,3 +59,34 @@
     content: |
       # Everyday do the backup of the PostgreSQL DB
       50 22 * * * postgres /usr/bin/pg_dumpall | xz >/var/lib/postgresql/backup.sql.xz
+
+- name: "Create user {{ postgresql_db_user }} without superuser and createdb privileges"
+  when: postgresql_db_user is defined and postgresql_db_user_password is defined
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: "{{ postgresql_db_user }}"
+    password: "{{ postgresql_db_user_password }}"
+    role_attr_flags: NOSUPERUSER,NOCREATEDB
+    encrypted: yes
+    state: present
+
+- name: "Create database {{ postgresql_db_name }} owned by user {{ postgresql_db_user }}"
+  when: postgresql_db_user is defined and postgresql_db_name is defined
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: "{{ postgresql_db_name }}"
+    encoding: 'UTF-8'
+    owner: "{{ postgresql_db_user }}"
+    state: present
+
+- name: "Create schema {{ postgresql_db_user }} in database {{ postgresql_db_name }}"
+  when: postgresql_db_user is defined and postgresql_db_name is defined
+  become: yes
+  become_user: postgres
+  postgresql_schema:
+    database: "{{ postgresql_db_name }}"
+    name: "{{ postgresql_db_user }}"
+    owner: "{{ postgresql_db_user }}"
+    state: present

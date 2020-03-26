@@ -1,12 +1,22 @@
 ---
 
-- name: "set max_connections = {{ postgresql_max_connections }}"
+- name: "allow listening on TCP port on all network interfaces"
+  when: postgresql_allow_remote_connections
   become: yes
   become_user: postgres
   postgresql_set:
-    name: max_connections
-    value: "{{ postgresql_max_connections | string }}"
+    name: listen_addresses
+    value: '*'
   notify: "restart postgresql"
+
+- name: "set settings using ALTER SYSTEM"
+  become: yes
+  become_user: postgres
+  postgresql_set:
+    name: "{{ item.key }}"
+    value: "{{ item.value | string }}"
+  notify: "restart postgresql"
+  loop: "{{ postgresql_settings|dict2items }}"
 
 - name: "Set TLS cert"
   when: postgresql_certificate_file is defined
@@ -35,33 +45,3 @@
     value: "{{ postgresql_certificate_chain_file }}"
   notify: "restart postgresql"
 
-- name: "Create user {{ postgresql_db_user }} without superuser and createdb privileges"
-  when: postgresql_db_user is defined and postgresql_db_user_password is defined
-  become: yes
-  become_user: postgres
-  postgresql_user:
-    name: "{{ postgresql_db_user }}"
-    password: "{{ postgresql_db_user_password }}"
-    role_attr_flags: NOSUPERUSER,NOCREATEDB
-    encrypted: yes
-    state: present
-
-- name: "Create database {{ postgresql_db_name }} owned by user {{ postgresql_db_user }}"
-  when: postgresql_db_user is defined and postgresql_db_name is defined
-  become: yes
-  become_user: postgres
-  postgresql_db:
-    name: "{{ postgresql_db_name }}"
-    encoding: 'UTF-8'
-    owner: "{{ postgresql_db_user }}"
-    state: present
-
-- name: "Create schema {{ postgresql_db_user }} in database {{ postgresql_db_name }}"
-  when: postgresql_db_user is defined and postgresql_db_name is defined
-  become: yes
-  become_user: postgres
-  postgresql_schema:
-    database: "{{ postgresql_db_name }}"
-    name: "{{ postgresql_db_user }}"
-    owner: "{{ postgresql_db_user }}"
-    state: present
