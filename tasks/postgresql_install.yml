@@ -35,6 +35,7 @@
       - "python-ipaddress"
       - "libpq-dev"
       - "xz-utils"
+      - "sudo"
     state: present
 
 - name: "Hold postgresql package from upgrading"
