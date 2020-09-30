@@ -1,0 +1,64 @@
+- name: "Install lsb-release"
+  package:
+    name:
+      - redhat-lsb-core
+
+- name: "Add PostgreSQL Global Development Group (PGDG) repository"
+  yum:
+    name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    state: present
+
+- name: "Install packages for Postgres {{ postgresql_version }}"
+  package:
+    name:
+      - "postgresql{{ postgresql_version }}-server"
+      - "postgresql{{ postgresql_version }}-contrib"
+      - "python-psycopg2"
+      - "xz"
+    state: present
+
+#- name: "Hold postgresql package from upgrading"
+#  when: postgresql_hold_upgrades
+#  dpkg_selections:
+#    name: "postgresql-{{ postgresql_version }}"
+#    selection: hold
+
+- name: "Create cron job for dumping data to a file usable for filesystem backup"
+  when: postgresql_daily_backup
+  cron:
+    name: "Everyday do the backup of the PostgreSQL DB"
+    cron_file: postgresql-backup
+    hour: "22"
+    minute: "50"
+    user: postgres
+    job: "/usr/bin/pg_dumpall | xz >/var/lib/pgsql/backup.sql.xz"
+
+- name: "detect initialized db cluster"
+  stat:
+    path: "/var/lib/pgsql/{{ postgresql_version }}/data/PG_VERSION"
+  register: pgclust
+
+- name: "initialize db cluster"
+  when: not pgclust.stat.exists
+  command:
+    cmd: "/usr/pgsql-13/bin/postgresql-13-setup initdb"
+
+- name: "enable postgresql after reboot"
+  service:
+    name: "postgresql-{{ postgresql_version }}"
+    enabled: yes
+
+- name: "start postgresql now"
+  service:
+    name: "postgresql-{{ postgresql_version }}"
+    state: started
+
+- name: "add rows to pg_hba.conf"
+  postgresql_pg_hba:
+    dest: "/var/lib/pgsql/{{ postgresql_version }}/data/pg_hba.conf"
+    contype: hostssl
+    databases: all
+    users: all
+    address: all
+    method: md5
+  notify: "restart postgresql"

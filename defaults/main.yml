@@ -1,5 +1,5 @@
 ---
-postgresql_version: 12
+postgresql_version: 13
 postgresql_hold_upgrades: yes
 
 postgresql_daily_backup: yes

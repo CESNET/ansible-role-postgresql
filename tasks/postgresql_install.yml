@@ -1,65 +1,20 @@
 ---
-- name: "require Debian 10"
-  assert:
-    that:
-      - ansible_distribution == "Debian"
-      - ansible_distribution_major_version == "10"
-    msg: "Only Debian 10 is supported"
-
 - debug:
-    msg: "postgresql_version is {{ postgresql_version }}"
+    msg: "on OS {{ ansible_os_family }}/{{ ansible_distribution }} {{ ansible_distribution_major_version }} postgresql_version is {{ postgresql_version }}"
 
-- name: "Install lsb-release"
-  apt:
-    name:
-      - lsb-release
+- name: "require supported OS"
+  assert:
+    that: >-
+      ( ansible_distribution == "Debian" and ansible_distribution_major_version in [ "10" ] )
+      or ( ansible_os_family == "RedHat" and ansible_distribution_major_version in [ "7" ] )
+    msg: "Only Debian 10, and CentOS/RedHat 7 are supported"
 
-- name: "Add PostgreSQL Global Development Group (PGDG) repository key"
-  apt_key:
-    id: ACCC4CF8
-    url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
-    state: present
-
-- name: "Add PGDG repository"
-  apt_repository:
-    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_lsb.codename }}-pgdg main"
-    filename: "pgdg"
-    state: present
-
-- name: "Install packages for Postgres {{ postgresql_version }}"
-  package:
-    name:
-      - "postgresql-{{ postgresql_version }}"
-      - "postgresql-client-{{ postgresql_version }}"
-      - "python-psycopg2"
-      - "python-ipaddress"
-      - "libpq-dev"
-      - "xz-utils"
-      - "sudo"
-    state: present
-
-- name: "Hold postgresql package from upgrading"
-  when: postgresql_hold_upgrades
-  dpkg_selections:
-    name: "postgresql-{{ postgresql_version }}"
-    selection: hold
-
-- name: "add rows to pg_hba.conf"
-  postgresql_pg_hba:
-    dest: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
-    contype: hostssl
-    databases: all
-    users: all
-    address: all
-    method: md5
-
-- name: "Create cron job for dumping data to a file usable for filesystem backup"
-  when: postgresql_daily_backup
-  copy:
-    dest: "/etc/cron.d/postgresql-backup"
-    content: |
-      # Everyday do the backup of the PostgreSQL DB
-      50 22 * * * postgres /usr/bin/pg_dumpall | xz >/var/lib/postgresql/backup.sql.xz
+- name: "include OS-specific tasks for installation"
+  include_tasks:
+    file: "postgresql_install_{{ ansible_os_family }}.yml"
+    apply:
+      tags:
+        - postgresql
 
 - name: "Create user {{ postgresql_db_user }} without superuser and createdb privileges"
   when: postgresql_db_user is defined and postgresql_db_user_password is defined

@@ -3,5 +3,9 @@
 - name: "restart postgresql"
   service:
     state: restarted
-    name: postgresql
+    name: "{{ servicename[ansible_os_family] }}"
   listen: "restart postgresql"
+  vars:
+    servicename:
+      Debian: postgresql
+      RedHat: postgresql-{{ postgresql_version }}
