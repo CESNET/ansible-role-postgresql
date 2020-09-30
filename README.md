@@ -7,7 +7,7 @@ server from PGDG repository.
 Role Variables
 --------------
 
-- **postgresql_version** - version to install, prevents automatic major version upgrade, default is 12
+- **postgresql_version** - version to install, prevents automatic major version upgrade, default is 13
 - **postgresql_hold_upgrades** - block server from automcatic upgrades and thus restarts, default is yes
 - **postgresql_allow_remote_connections** - boolean flag for listening on all network interfaces, default is yes
 - **postgresql_daily_backup** - boolean flag whether to dump DB content into file /var/lib/postgresql/backup.sql.xz, default is True
@@ -26,7 +26,7 @@ Example Playbook
   roles:
     - role: cesnet.postgresql
       vars:
-        postgresql_version: 12
+        postgresql_version: 13
         postgresql_hold_upgrades: no
         postgresql_allow_remote_connections: yes
         postgresql_daily_backup: yes
