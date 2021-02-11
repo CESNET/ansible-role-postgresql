@@ -31,7 +31,7 @@
     hour: "22"
     minute: "50"
     user: postgres
-    job: "/usr/bin/pg_dumpall | xz >/var/lib/pgsql/backup.sql.xz"
+    job: "umask 027 ; rm /var/lib/pgsql/backup.sql.xz ; /usr/bin/pg_dumpall | xz >/var/lib/pgsql/backup.sql.xz"
 
 - name: "detect initialized db cluster"
   stat:

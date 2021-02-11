@@ -41,7 +41,7 @@
     hour: "22"
     minute: "50"
     user: postgres
-    job: "/usr/bin/pg_dumpall | xz >/var/lib/postgresql/backup.sql.xz"
+    job: "umask 027 ; rm /var/lib/postgresql/backup.sql.xz ; /usr/bin/pg_dumpall | xz >/var/lib/postgresql/backup.sql.xz"
 
 - name: "add rows to pg_hba.conf"
   postgresql_pg_hba:
