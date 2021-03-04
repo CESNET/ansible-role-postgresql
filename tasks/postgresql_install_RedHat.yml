@@ -28,8 +28,8 @@
   cron:
     name: "Everyday do the backup of the PostgreSQL DB"
     cron_file: postgresql-backup
-    hour: "22"
-    minute: "50"
+    hour: "{{ postgresql_daily_backup_hour }}"
+    minute: "{{ postgresql_daily_backup_minute }}"
     user: postgres
     job: "umask 027 ; rm /var/lib/pgsql/backup.sql.xz ; /usr/bin/pg_dumpall | xz >/var/lib/pgsql/backup.sql.xz"
 
