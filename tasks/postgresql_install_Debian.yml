@@ -41,7 +41,7 @@
     hour: "{{ postgresql_daily_backup_hour | string }}"
     minute: "{{ postgresql_daily_backup_minute | string }}"
     user: postgres
-    job: "umask 027 ; rm /var/lib/postgresql/backup.sql.xz ; /usr/bin/pg_dumpall | xz >/var/lib/postgresql/backup.sql.xz"
+    job: "umask 027 ; rm /var/lib/postgresql/backup.sql.xz ; /usr/bin/pg_dumpall | xz -T 0 -3 >/var/lib/postgresql/backup.sql.xz"
 
 - name: "add rows to pg_hba.conf"
   postgresql_pg_hba:
