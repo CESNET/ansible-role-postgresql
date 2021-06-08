@@ -20,8 +20,7 @@
     name:
       - "postgresql-{{ postgresql_version }}"
       - "postgresql-client-{{ postgresql_version }}"
-      - "python-psycopg2"
-      - "python-ipaddress"
+      - "python3-psycopg2"
       - "libpq-dev"
       - "xz-utils"
       - "sudo"
