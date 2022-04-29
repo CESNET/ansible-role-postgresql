@@ -22,7 +22,7 @@
       - "postgresql-client-{{ postgresql_version }}"
       - "python3-psycopg2"
       - "libpq-dev"
-      - "xz-utils"
+      - "zstd"
       - "sudo"
     state: present
 
@@ -40,7 +40,7 @@
     hour: "{{ postgresql_daily_backup_hour | string }}"
     minute: "{{ postgresql_daily_backup_minute | string }}"
     user: postgres
-    job: "umask 027 ; rm /var/lib/postgresql/backup.sql.xz ; /usr/bin/pg_dumpall | xz -T 0 -3 >/var/lib/postgresql/backup.sql.xz"
+    job: "umask 027 ; rm /var/lib/postgresql/backup.sql.zst ; /usr/bin/pg_dumpall | zstdmt -10 --quiet --force -o /var/lib/postgresql/backup.sql.zst"
 
 - name: "create /var/lib/postgresql/dump_psql_db.sh file"
   copy:
@@ -55,11 +55,11 @@
         exit 1
       fi
       DBNAME="$1"
-      FILENAME="$DBNAME"_`date +"%Y-%m-%d-%H-%M-%S"`.sql.xz
+      FILENAME="$DBNAME"_`date +"%Y-%m-%d-%H-%M-%S"`.sql.zst
       echo "dumping PostgreSQL database $DBNAME into $PWD/$FILENAME ..."
       export LANG=cs_CZ.UTF-8
       umask 0027
-      pg_dump $DBNAME | xz -T $(($(nproc)-2>1?$(nproc)-2:1)) -3 >"$FILENAME"
+      pg_dump $DBNAME | zstdmt -10 --quiet --force -o "$FILENAME"
 
 - name: "add rows to pg_hba.conf"
   postgresql_pg_hba:

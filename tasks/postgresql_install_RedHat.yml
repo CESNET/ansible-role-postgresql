@@ -41,7 +41,7 @@
 - name: "initialize db cluster"
   when: not pgclust.stat.exists
   command:
-    cmd: "/usr/pgsql-13/bin/postgresql-13-setup initdb"
+    cmd: "/usr/pgsql-{{ postgresql_version }}/bin/postgresql-{{ postgresql_version }}-setup initdb"
 
 - name: "enable postgresql after reboot"
   service:
