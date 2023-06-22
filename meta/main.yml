@@ -12,6 +12,8 @@ galaxy_info:
     - name: Debian
       versions:
         - buster
+        - bullseye
+        - bookworm
     - name: RedHat
       versions:
         - 7

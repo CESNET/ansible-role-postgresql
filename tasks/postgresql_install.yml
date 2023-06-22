@@ -5,9 +5,9 @@
 - name: "require supported OS"
   assert:
     that: >-
-      ( ansible_distribution == "Debian" and ansible_distribution_major_version in [ "10", "11" ] )
+      ( ansible_distribution == "Debian" and ansible_distribution_major_version in [ "10", "11", "12" ] )
       or ( ansible_os_family == "RedHat" and ansible_distribution_major_version in [ "7" ] )
-    msg: "Only Debian 10, and CentOS/RedHat 7 are supported"
+    msg: "Only Debian 10-12, and CentOS/RedHat 7 are supported"
 
 - name: "include OS-specific tasks for installation"
   include_tasks:

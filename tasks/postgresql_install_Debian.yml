@@ -1,17 +1,20 @@
-- name: "Install lsb-release"
-  apt:
-    name:
-      - lsb-release
+- name: "create /etc/apt/keyrings"
+  file:
+    state: directory
+    path: /etc/apt/keyrings
+    owner: root
+    group: root
+    mode: '0755'
 
-- name: "Add PostgreSQL Global Development Group (PGDG) repository key"
-  apt_key:
-    id: ACCC4CF8
+- name: "add PostgreSQL Global Development Group (PGDG) repository key"
+  get_url:
     url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
-    state: present
+    dest: /etc/apt/keyrings/pgdg.asc
+    force: false
 
 - name: "Add PGDG repository"
   apt_repository:
-    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_lsb.codename }}-pgdg main"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/pgdg.asc] http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
     filename: "pgdg"
     state: present
 
@@ -24,6 +27,7 @@
       - "libpq-dev"
       - "zstd"
       - "sudo"
+      - "cron"
     state: present
 
 - name: "Hold postgresql package from upgrading"
