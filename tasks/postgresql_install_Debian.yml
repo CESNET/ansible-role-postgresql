@@ -12,6 +12,12 @@
     dest: /etc/apt/keyrings/pgdg.asc
     force: false
 
+- name: "clean old line without signed-by"
+  lineinfile:
+    path: /etc/apt/sources.list.d/pgdg.list
+    line: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+    state: absent
+
 - name: "Add PGDG repository"
   apt_repository:
     repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/pgdg.asc] http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
