@@ -6,6 +6,7 @@ postgresql_daily_backup: yes
 # CESNET VMware makes daily snapshots between 21-24 hours
 postgresql_daily_backup_hour: 20
 postgresql_daily_backup_minute: 50
+postgresql_daily_backup_more_commands: ""
 postgresql_allow_remote_connections: yes
 
 postgresql_settings: {}

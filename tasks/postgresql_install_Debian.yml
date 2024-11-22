@@ -50,7 +50,7 @@
     hour: "{{ postgresql_daily_backup_hour | string }}"
     minute: "{{ postgresql_daily_backup_minute | string }}"
     user: postgres
-    job: "umask 027 ; rm /var/lib/postgresql/backup.sql.zst ; /usr/bin/pg_dumpall | zstdmt -10 --quiet --force -o /var/lib/postgresql/backup.sql.zst"
+    job: "umask 027 ; rm /var/lib/postgresql/backup.sql.zst ; /usr/bin/pg_dumpall | zstdmt -10 --quiet --force -o /var/lib/postgresql/backup.sql.zst{{ postgresql_daily_backup_more_commands }}"
 
 - name: "create /var/lib/postgresql/dump_psql_db.sh file"
   copy:

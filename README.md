@@ -12,6 +12,7 @@ Role Variables
 - **postgresql_allow_remote_connections** - boolean flag for listening on all network interfaces, default is yes
 - **postgresql_daily_backup** - boolean flag whether to dump DB content into file /var/lib/postgresql/backup.sql.xz, default is True
 - **postgresql_daily_backup_hour** and **postgresql_daily_backup_minute** - the hour and minute for the cron job making the DB dump, default is 20:50  
+- **postgresql_daily_backup_more_commands** - shell commands to be added to the backup cronjob, perhaps copying the backup somewhere else
 - **postgresql_settings** - dictionary of key-value pairs to be set using ALTER SYSTEM in $PGDATA/postgresql.auto.conf file, which is read in addition to postgresql.conf
 - **postgresql_db_user** - when set, creates a PostgreSQL user
 - **postgresql_db_user_password** - password for the user
