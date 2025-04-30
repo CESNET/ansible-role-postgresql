@@ -42,7 +42,7 @@
   become: yes
   become_user: postgres
   postgresql_schema:
-    database: "{{ postgresql_db_name }}"
+    login_db: "{{ postgresql_db_name }}"
     name: "{{ postgresql_db_user }}"
     owner: "{{ postgresql_db_user }}"
     state: present
