@@ -12,16 +12,20 @@
     dest: /etc/apt/keyrings/pgdg.asc
     force: false
 
-- name: "clean old line without signed-by"
-  lineinfile:
+- name: "remove old format pgdg.list"
+  file:
     path: /etc/apt/sources.list.d/pgdg.list
-    line: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
     state: absent
 
-- name: "Add PGDG repository"
-  apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/pgdg.asc] http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
-    filename: "pgdg"
+- name: "add PGDG repository as deb822-format pgdg.sources"
+  ansible.builtin.deb822_repository:
+    name: pgdg
+    types: deb
+    architectures: amd64
+    uris: http://apt.postgresql.org/pub/repos/apt/
+    suites: "{{ ansible_distribution_release }}-pgdg"
+    components: [ "main" ]
+    signed_by: /etc/apt/keyrings/pgdg.asc
     state: present
 
 - name: "Install packages for Postgres {{ postgresql_version }}"
