@@ -80,6 +80,17 @@
         priv: CONNECT
         role: pgwatch
 
+    - name: "grant pg_read_all_stats to user pgwatch"
+      when: postgresql_db_user is defined and postgresql_db_name is defined
+      become: yes
+      become_user: postgres
+      postgresql_privs:
+        state: present
+        login_db: "{{ postgresql_db_name }}"
+        type: group
+        obj: pg_read_all_stats
+        role: pgwatch
+
     - name: "add extension pg_stat_statements to database"
       when: postgresql_db_user is defined and postgresql_db_name is defined
       become: yes
