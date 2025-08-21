@@ -20,6 +20,7 @@ Role Variables
 - **postgresql_certificate_file** - path to PEM-encoded certificate, used for remote TLS connections (JDBC checks it)
 - **postgresql_certificate_key_file** - path to private key
 - **postgresql_certificate_chain_file** - path to CA certificate chain
+- **postgresql_pgwatch_password** - if defined, user pgwatch with connect privilege is created and extension pg_stat_statements is added
         
 Example Playbook
 ----------------

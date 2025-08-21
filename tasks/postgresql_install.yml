@@ -46,3 +46,47 @@
     name: "{{ postgresql_db_user }}"
     owner: "{{ postgresql_db_user }}"
     state: present
+
+- name: "add monitoring by Grafana"
+  when: postgresql_pgwatch_password is defined
+  block:
+    - name: "create user pgwatch"
+      become: yes
+      become_user: postgres
+      postgresql_user:
+        name: pgwatch
+        comment: "monitoring from Grafana"
+        password: "{{ postgresql_pgwatch_password }}"
+        role_attr_flags: NOSUPERUSER,NOCREATEDB,NOCREATEROLE
+        encrypted: yes
+        state: present
+
+    - name: "add shared_preload_libraries=pg_stat_statements"
+      become: yes
+      become_user: postgres
+      postgresql_set:
+        name: shared_preload_libraries
+        value: pg_stat_statements
+      notify: "restart postgresql"
+
+    - name: "grant connect on database to user pgwatch"
+      when: postgresql_db_user is defined and postgresql_db_name is defined
+      become: yes
+      become_user: postgres
+      postgresql_privs:
+        state: present
+        login_db: "{{ postgresql_db_name }}"
+        type: database
+        priv: CONNECT
+        role: pgwatch
+
+    - name: "add extension pg_stat_statements to database"
+      when: postgresql_db_user is defined and postgresql_db_name is defined
+      become: yes
+      become_user: postgres
+      postgresql_ext:
+        login_db: "{{ postgresql_db_name }}"
+        name: "{{ item }}"
+      loop:
+        - pg_stat_statements
+
