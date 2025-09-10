@@ -4,16 +4,16 @@
   when: postgresql_allow_remote_connections
   become: yes
   become_user: postgres
-  postgresql_set:
-    name: listen_addresses
+  community.postgresql.postgresql_alter_system:
+    param: listen_addresses
     value: '*'
   notify: "restart postgresql"
 
 - name: "set settings using ALTER SYSTEM"
   become: yes
   become_user: postgres
-  postgresql_set:
-    name: "{{ item.key }}"
+  community.postgresql.postgresql_alter_system:
+    param: "{{ item.key }}"
     value: "{{ item.value | string }}"
   notify: "restart postgresql"
   loop: "{{ postgresql_settings|dict2items }}"
@@ -22,8 +22,8 @@
   when: postgresql_certificate_file is defined
   become: yes
   become_user: postgres
-  postgresql_set:
-    name: ssl_cert_file
+  community.postgresql.postgresql_alter_system:
+    param: ssl_cert_file
     value: "{{ postgresql_certificate_file }}"
   notify: "restart postgresql"
 
@@ -31,8 +31,8 @@
   when: postgresql_certificate_key_file is defined
   become: yes
   become_user: postgres
-  postgresql_set:
-    name: ssl_key_file
+  community.postgresql.postgresql_alter_system:
+    param: ssl_key_file
     value: "{{ postgresql_certificate_key_file }}"
   notify: "restart postgresql"
 
@@ -40,8 +40,8 @@
   when: postgresql_certificate_chain_file is defined
   become: yes
   become_user: postgres
-  postgresql_set:
-    name: ssl_ca_file
+  community.postgresql.postgresql_alter_system:
+    param: ssl_ca_file
     value: "{{ postgresql_certificate_chain_file }}"
   notify: "restart postgresql"
 

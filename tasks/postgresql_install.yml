@@ -64,8 +64,8 @@
     - name: "add shared_preload_libraries=pg_stat_statements"
       become: yes
       become_user: postgres
-      postgresql_set:
-        name: shared_preload_libraries
+      community.postgresql.postgresql_alter_system:
+        param: shared_preload_libraries
         value: pg_stat_statements
       notify: "restart postgresql"
 
