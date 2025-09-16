@@ -82,5 +82,6 @@
     databases: all
     users: all
     address: all
-    method: md5
+    method: "{{ postgresql_pg_hba_auth_method }}"
+  when: postgresql_pg_hba_add_allow_all
   notify: "restart postgresql"

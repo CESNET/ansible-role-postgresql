@@ -21,6 +21,8 @@ Role Variables
 - **postgresql_certificate_key_file** - path to private key
 - **postgresql_certificate_chain_file** - path to CA certificate chain
 - **postgresql_pgwatch_password** - if defined, user pgwatch with connect privilege is created and extension pg_stat_statements is added
+- **postgresql_pg_hba_add_allow_all** when set to false, pg_hba.conf entry allowing all connections isn't added.
+- **postgresql_pg_hba_auth_method** allows changing the auth method for the pg_hba added by this role, default is md5 (for backward compatibility).
         
 Example Playbook
 ----------------
