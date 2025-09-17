@@ -10,3 +10,5 @@ postgresql_daily_backup_more_commands: ""
 postgresql_allow_remote_connections: yes
 
 postgresql_settings: {}
+postgresql_pg_hba_add_allow_all: true
+postgresql_pg_hba_auth_method: md5 # update to scram-sha-256 for additional password protection of remote authentication
