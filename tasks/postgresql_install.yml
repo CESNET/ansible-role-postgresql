@@ -1,13 +1,13 @@
 ---
 - debug:
-    msg: "on OS {{ ansible_os_family }}/{{ ansible_distribution }} {{ ansible_distribution_major_version }} postgresql_version is {{ postgresql_version }}"
+    msg: "on OS {{ ansible_facts['os_family'] }}/{{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }} postgresql_version is {{ postgresql_version }}"
 
 - name: "require supported OS"
   assert:
     that: >-
-      ( ansible_distribution == "Debian" and ansible_distribution_major_version is version('10','>=') )
-      or ( ansible_os_family == "RedHat" and ansible_distribution_major_version in [ "7" ] )
-    msg: "Only Debian 10+, and CentOS/RedHat 7 are supported"
+      ( ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] is version('10','>=') )
+      or ( ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] in [ "7" ] )
+    fail_msg: "Only Debian 10+, and CentOS/RedHat 7 are supported"
 
 - name: "include OS-specific tasks for installation"
   include_tasks:

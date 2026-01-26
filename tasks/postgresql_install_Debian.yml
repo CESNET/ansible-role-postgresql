@@ -23,7 +23,7 @@
     types: deb
     architectures: amd64
     uris: http://apt.postgresql.org/pub/repos/apt/
-    suites: "{{ ansible_distribution_release }}-pgdg"
+    suites: "{{ ansible_facts['distribution_release'] }}-pgdg"
     components: [ "main" ]
     signed_by: /etc/apt/keyrings/pgdg.asc
     state: present
