@@ -5,7 +5,7 @@
 
 - name: "Add PostgreSQL Global Development Group (PGDG) repository"
   yum:
-    name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_facts['distribution_major_version'] }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
     state: present
 
 - name: "Install packages for Postgres {{ postgresql_version }}"
