@@ -3,7 +3,7 @@
 - name: "restart postgresql"
   service:
     state: restarted
-    name: "{{ servicename[ansible_os_family] }}"
+    name: "{{ servicename[ansible_facts['os_family']] }}"
   listen: "restart postgresql"
   vars:
     servicename:
