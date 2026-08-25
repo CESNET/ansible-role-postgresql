@@ -31,7 +31,7 @@ Example Playbook
   roles:
     - role: cesnet.postgresql
       vars:
-        postgresql_version: 17
+        postgresql_version: 18
         postgresql_hold_upgrades: no
         postgresql_allow_remote_connections: yes
         postgresql_daily_backup: yes
